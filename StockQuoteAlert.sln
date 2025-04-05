@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockQuoteAlert", "StockQuoteAlert\StockQuoteAlert.csproj", "{951ACC3B-00DF-4BA7-805D-C0E0368C75F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{08D2E675-31B7-4B64-934F-2B3120C445D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{951ACC3B-00DF-4BA7-805D-C0E0368C75F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{951ACC3B-00DF-4BA7-805D-C0E0368C75F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{951ACC3B-00DF-4BA7-805D-C0E0368C75F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08D2E675-31B7-4B64-934F-2B3120C445D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08D2E675-31B7-4B64-934F-2B3120C445D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08D2E675-31B7-4B64-934F-2B3120C445D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08D2E675-31B7-4B64-934F-2B3120C445D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
