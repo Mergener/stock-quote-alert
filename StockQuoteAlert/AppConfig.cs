@@ -13,7 +13,7 @@ namespace StockQuoteAlert
         public string? TwelveDataAPIKey { get; set; }
         #endregion
 
-        #region
+        #region Initialization
         public static AppConfig Active { get; private set; } = new();
 
         public static void LoadFromFile(string path)
