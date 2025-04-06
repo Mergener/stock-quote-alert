@@ -42,7 +42,7 @@ namespace StockQuoteAlert.Stocks
         {
             if (apiKey is null)
             {
-                throw new Exception("Api Key cannot be null.");
+                throw new ArgumentNullException("Api Key cannot be null.");
             }
 
             this.apiKey = apiKey;
