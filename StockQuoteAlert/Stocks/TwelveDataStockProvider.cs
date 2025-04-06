@@ -13,11 +13,9 @@ namespace StockQuoteAlert.Stocks
 {
     internal class TwelveDataStockProvider : IStockProvider, IDisposable
     {
-        #region Fields
         private readonly HttpClient httpClient = new();
         private readonly string apiKey;
         private bool disposedValue;
-        #endregion
 
         private record class GetPriceResponse([property: JsonPropertyName("price")] string Price);
 
@@ -37,15 +35,12 @@ namespace StockQuoteAlert.Stocks
             return null;
         }
 
-        #region Constructor
         public TwelveDataStockProvider(string apiKey, string baseUrl = "https://api.twelvedata.com/")
         {
             this.apiKey = apiKey;
             httpClient.BaseAddress = new Uri(baseUrl);
         }
-        #endregion
 
-        #region Disposable
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -63,6 +58,5 @@ namespace StockQuoteAlert.Stocks
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-        #endregion
     }
 }
