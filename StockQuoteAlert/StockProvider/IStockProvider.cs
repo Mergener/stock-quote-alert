@@ -1,6 +1,6 @@
 ﻿namespace StockQuoteAlert.Stocks
 {
-    internal interface IStockProvider
+    public interface IStockProvider
     {
         public Task<decimal?> GetLatestStockPrice(string stockName);
     }
