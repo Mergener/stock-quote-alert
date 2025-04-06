@@ -2,7 +2,7 @@
 
 namespace StockQuoteAlert.StockMonitor
 {
-    internal class StockMonitor
+    public class StockMonitor
     {
         public event Action<string, decimal>? PriceBelowLowerbound;
         public event Action<string, decimal>? PriceAboveUpperbound;

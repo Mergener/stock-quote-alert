@@ -11,7 +11,7 @@ using static System.Net.WebRequestMethods;
 
 namespace StockQuoteAlert.Stocks
 {
-    internal class TwelveDataStockProvider : IStockProvider, IDisposable
+    public class TwelveDataStockProvider : IStockProvider, IDisposable
     {
         private readonly HttpClient httpClient = new();
         private readonly string apiKey;
