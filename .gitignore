@@ -57,3 +57,7 @@ nunit-*.xml
 .vscode
 .idea
 .vs
+
+# Sensitive data
+config.json
+StockQuoteAlert/Properties/launchSettings.json
