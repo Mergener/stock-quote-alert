@@ -1,2 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using StockQuoteAlert;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        AppConfig.LoadFromFile(args[0]);
+    }
+}
