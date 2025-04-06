@@ -24,7 +24,7 @@ namespace StockQuoteAlert.StockMonitor
             {
                 PriceBelowLowerbound?.Invoke(TargetStock, (decimal)stockPrice);
             }
-            else if (stockPrice > UpperBound) {
+            else if (stockPrice > UpperBound)
             {
                 PriceAboveUpperbound?.Invoke(TargetStock, (decimal)stockPrice);
             }
