@@ -35,10 +35,18 @@ namespace StockQuoteAlert.Stocks
             return null;
         }
 
-        public TwelveDataStockProvider(string apiKey, string baseUrl = "https://api.twelvedata.com/")
+        public TwelveDataStockProvider()
+            : this(AppConfig.Active.TwelveDataAPIKey!) { }
+
+        public TwelveDataStockProvider(string apiKey)
         {
+            if (apiKey is null)
+            {
+                throw new Exception("Api Key cannot be null.");
+            }
+
             this.apiKey = apiKey;
-            httpClient.BaseAddress = new Uri(baseUrl);
+            httpClient.BaseAddress = new Uri("https://api.twelvedata.com/");
         }
 
         protected virtual void Dispose(bool disposing)
