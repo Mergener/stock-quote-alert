@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-
-namespace StockQuoteAlert.Emails
+﻿namespace StockQuoteAlert.Emails
 {
     public record EmailAddress(string Address, string Name);
     public record SendEmailArgs(string To, string? Subject, string? Content);

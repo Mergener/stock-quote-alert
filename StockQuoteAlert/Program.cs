@@ -1,5 +1,4 @@
-﻿using MimeKit;
-using StockQuoteAlert;
+﻿using StockQuoteAlert;
 using StockQuoteAlert.Emails;
 using StockQuoteAlert.StockMonitor;
 using StockQuoteAlert.Stocks;
