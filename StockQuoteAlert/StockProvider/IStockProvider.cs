@@ -2,6 +2,6 @@
 {
     public interface IStockProvider
     {
-        public Task<decimal?> GetLatestStockPrice(string stockName);
+        public Task<decimal> GetLatestStockPrice(string stockName);
     }
 }

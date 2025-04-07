@@ -7,22 +7,21 @@ namespace Tests
     {
         /// <summary>
         /// A pseudo stock provider that returns the repeating
-        /// sequence 6, 3, 9, null, 6, 3, 9, null, 6... as the stock price.
+        /// sequence 6, 3, 9, 6, 3, 9, 6... as the stock price.
         /// </summary>
         class StockProvider639 : IStockProvider
         {
-            private static IEnumerator<decimal?> GetStockPrice()
+            private static IEnumerator<decimal> GetStockPrice()
             {
                 while (true)
                 {
                     yield return 6;
                     yield return 3;
                     yield return 9;
-                    yield return null;
                 }
             }
 
-            private readonly IEnumerator<decimal?> stockEnumerator;
+            private readonly IEnumerator<decimal> stockEnumerator;
 
             public StockProvider639()
             {
@@ -30,7 +29,7 @@ namespace Tests
                 stockEnumerator.MoveNext();
             }
 
-            public Task<decimal?> GetLatestStockPrice(string stockName)
+            public Task<decimal> GetLatestStockPrice(string stockName)
             {
                 var currentPrice = stockEnumerator.Current;
                 stockEnumerator.MoveNext();
@@ -70,7 +69,7 @@ namespace Tests
                 calledUpperbound = true;
             };
 
-            // First call returns 6, which is inside our expected interval.
+            // First call returns 6, which is within our expected interval.
             await stockMonitor.Poll();
             Assert.False(calledLowerbound);
             Assert.False(calledUpperbound);
@@ -86,12 +85,6 @@ namespace Tests
             Assert.False(calledLowerbound);
             Assert.True(calledUpperbound);
             calledUpperbound = false;
-
-            // Now, it should return null.
-            // This must be gracefully handled and no callbacks should be called.
-            await stockMonitor.Poll();
-            Assert.False(calledLowerbound);
-            Assert.False(calledUpperbound);
         }
     }
 }
