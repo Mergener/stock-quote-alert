@@ -1,6 +1,4 @@
-﻿using StockQuoteAlert.Stocks;
-
-namespace StockQuoteAlert.StockMonitor
+﻿namespace StockQuoteAlert.Stocks
 {
     public class StockMonitor
     {
