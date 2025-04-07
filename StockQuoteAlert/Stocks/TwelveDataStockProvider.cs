@@ -32,7 +32,7 @@ namespace StockQuoteAlert.Stocks
             // wrong decimal points.
             if (!decimal.TryParse(body?.Price,
                                  NumberStyles.Number,
-                                 CultureInfo.InvariantCulture, 
+                                 CultureInfo.InvariantCulture,
                                  out var price))
             {
                 throw new Exception($"Invalid price format returned from TwelveData API: '{body?.Price}'");
