@@ -4,6 +4,13 @@ namespace StockQuoteAlert
 {
     internal class AppConfig
     {
+        #region Monitoring
+        /// <summary>
+        /// Interval, in seconds, between each stock API call.
+        /// </summary>
+        public double MonitoringInterval { get; set; } = 10.0;
+        #endregion
+
         #region Twelve Data
         public string? TwelveDataAPIKey { get; set; }
         #endregion
