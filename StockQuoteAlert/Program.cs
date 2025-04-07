@@ -80,11 +80,12 @@ class Program
             Console.WriteLine("Sent purchase warning email.");
         };
 
-        const int INTERVAL_MS = 2000;
         while (true)
         {
             _ = stockMonitor.Poll();
-            await Task.Delay(INTERVAL_MS);
+
+            int intervalMs = (int)(AppConfig.Active.MonitoringInterval * 1000.0);
+            await Task.Delay(intervalMs);
         }
     }
 }
