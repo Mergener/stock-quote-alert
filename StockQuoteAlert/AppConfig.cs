@@ -13,6 +13,16 @@ namespace StockQuoteAlert
         public string? TwelveDataAPIKey { get; set; }
         #endregion
 
+        #region SMTP
+        public string? SMTPUsername { get; set; }
+        public string? SMTPPassword { get; set; }
+        public string? SMTPHost { get; set; }
+        public string SMTPFromName { get; set; } = string.Empty;
+        public string? SMTPToAddress { get; set; }
+        public int SMTPPort { get; set; } = 587;
+        public bool SMTPSSL { get; set; } = true;
+        #endregion
+
         #region Initialization
         public static AppConfig Active { get; private set; } = new();
 
