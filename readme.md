@@ -51,3 +51,5 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 - `SMTPPort` (int): The SMTP port number. Defaults to `587` if unspecified.
 
 - `SMTPSSL` (bool): Whether to use SSL for the SMTP connection. Defaults to `false` if unspecified.
+
+- `MonitoringInterval` (int): Interval, in seconds, between each stock price check. Defaults to `10` if unspecified.
