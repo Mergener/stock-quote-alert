@@ -1,4 +1,6 @@
-﻿using StockQuoteAlert;
+﻿using MimeKit;
+using StockQuoteAlert;
+using StockQuoteAlert.Emails;
 using StockQuoteAlert.StockMonitor;
 using StockQuoteAlert.Stocks;
 
@@ -39,7 +41,7 @@ class Program
         AppConfig.LoadFromFile(configPath);
         Console.WriteLine($"Successfully loaded config from {configPath}.");
 
-        IStockProvider stockProvider = new TwelveDataStockProvider();
+        var stockProvider = new TwelveDataStockProvider();
         var stockMonitor = new StockMonitor() { 
             StockProvider = stockProvider, 
             LowerBound = parsedArgs.LowerBound, 
@@ -47,16 +49,39 @@ class Program
             TargetStock = parsedArgs.Stock 
         };
 
-        stockMonitor.PriceAboveUpperbound += (string stock, decimal price) =>
+        var emailClient = new MailkitEmailClient(
+            AppConfig.Active.SMTPHost ?? throw new Exception("No SMTP host found in config."),
+            AppConfig.Active.SMTPPort,
+            AppConfig.Active.SMTPUsername,
+            AppConfig.Active.SMTPPassword,
+            AppConfig.Active.SMTPSSL
+            )
         {
-            Console.WriteLine($"Sell {stock}! Latest price: {price}");
-        };
-        stockMonitor.PriceBelowLowerbound += (string stock, decimal price) =>
-        {
-            Console.WriteLine($"Buy {stock}! Latest price: {price}");
+            From = new EmailAddress(
+                AppConfig.Active.SMTPFromName,
+                AppConfig.Active.SMTPUsername ?? throw new Exception("No SMTP 'from' address found in config.")
+            )
         };
 
-        Console.WriteLine($"Monitoring stock {parsedArgs.Stock}.");
+        stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
+        {
+            await emailClient.SendEmail(new SendEmailArgs(
+                To: AppConfig.Active.SMTPToAddress ?? throw new Exception("No SMTP 'to' address found in config."),
+                Subject: "Sell a stock!",
+                Content: $"Sell {stock}!\nLatest price: {price} (at {DateTime.Now})"
+            ));
+            Console.WriteLine("Sent sell warning email.");
+        };
+        stockMonitor.PriceBelowLowerbound += async (string stock, decimal price) =>
+        {
+            await emailClient.SendEmail(new SendEmailArgs(
+                To: AppConfig.Active.SMTPToAddress ?? throw new Exception("No SMTP 'to' address found in config."),
+                Subject: "Buy a stock!",
+                Content: $"Buy {stock}!\nLatest price: {price} (at {DateTime.Now})"
+            ));
+            Console.WriteLine("Sent purchase warning email.");
+        };
+
         const int INTERVAL_MS = 2000;
         while (true)
         {
