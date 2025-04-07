@@ -1,7 +1,6 @@
 ﻿using StockQuoteAlert;
 using StockQuoteAlert.Emails;
 using StockQuoteAlert.Stocks;
-using StockQuoteAlert.Stocks.Providers;
 
 class Program
 {

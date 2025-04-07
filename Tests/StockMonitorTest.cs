@@ -1,4 +1,3 @@
-using StockQuoteAlert.StockMonitor;
 using StockQuoteAlert.Stocks;
 
 namespace Tests
