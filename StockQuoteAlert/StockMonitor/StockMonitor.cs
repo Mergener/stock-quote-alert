@@ -14,19 +14,22 @@ namespace StockQuoteAlert.StockMonitor
 
         public async Task Poll()
         {
-            var stockPrice = await StockProvider.GetLatestStockPrice(TargetStock);
-            if (stockPrice == null)
+            try
             {
-                return;
-            }
+                var stockPrice = await StockProvider.GetLatestStockPrice(TargetStock);
 
-            if (stockPrice < LowerBound)
-            {
-                PriceBelowLowerbound?.Invoke(TargetStock, (decimal)stockPrice);
+                if (stockPrice < LowerBound)
+                {
+                    PriceBelowLowerbound?.Invoke(TargetStock, stockPrice);
+                }
+                else if (stockPrice > UpperBound)
+                {
+                    PriceAboveUpperbound?.Invoke(TargetStock, stockPrice);
+                }
             }
-            else if (stockPrice > UpperBound)
+            catch (Exception ex)
             {
-                PriceAboveUpperbound?.Invoke(TargetStock, (decimal)stockPrice);
+                Console.Error.WriteLine($"Error while monitoring stocks: {ex.Message}");
             }
         }
     }
