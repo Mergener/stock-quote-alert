@@ -49,11 +49,32 @@ class Program
 
     static IStockProvider SetupStockProvider(AppConfig config)
     {
-        if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+        if (string.IsNullOrEmpty(config.StockAPI))
         {
-            throw new InvalidOperationException("Missing 'TwelveDataAPIKey' in configuration file.");
+            throw new InvalidOperationException("A valid stock API must be provided in the 'StockAPI' option" +
+                " of the config file. " +
+                "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
         }
-        return new TwelveDataStockProvider(config.TwelveDataAPIKey!);
+
+        IStockProvider stockProvider;
+
+        if (config.StockAPI == "twelvedata")
+        {
+            // Check for API key.
+            if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+            {
+                throw new InvalidOperationException("Missing API key for TwelveData. " +
+                    "Specify one with the 'TwelveDataAPIKey' option in the config file.");
+            }
+            stockProvider = new TwelveDataStockProvider(config.TwelveDataAPIKey);
+        }
+        else
+        {
+            throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
+                "Valid options are " + AppConfig.SUPPORTED_STOCK_APIS);
+        }
+
+        return stockProvider;
     }
 
     static IEmailClient SetupEmailClient(AppConfig config)

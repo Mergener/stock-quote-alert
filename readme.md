@@ -44,6 +44,10 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 - `SMTPHost` (string): The SMTP server address for your email provider. For example, for Gmail, it would be `smtp.gmail.com`.
 
+- `StockAPI` (string): The stock API of choice. Currently supported options are: `"twelvedata"`.
+
+#### Stock API Dependent fields
+If you choose the TwelveData API, you must also provide the following field:
 - `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
 
 ### Optional Fields

@@ -1,7 +1,8 @@
 {
-  "TwelveDataAPIKey": "your-twelve-data-api-key",
   "SMTPUsername": "your-email-username@your-email-provider.your-domain",
   "SMTPPassword": "your-smtp-password",
   "SMTPHost": "your-smtp-host",
-  "RecipientAddress": "destination-email-address@some-email-provider.email-domain"
+  "RecipientAddress": "destination-email-address@some-email-provider.email-domain",
+  "StockAPI": "twelvedata",
+  "TwelveDataAPIKey": "your-twelve-data-api-key"
 }
