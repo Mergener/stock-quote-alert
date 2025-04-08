@@ -82,8 +82,6 @@ class Program
                 "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
         }
 
-        IStockProvider stockProvider;
-
         if (config.StockAPI == "twelvedata")
         {
             // Check for API key.
@@ -92,25 +90,34 @@ class Program
                 throw new InvalidOperationException("Missing API key for TwelveData. " +
                     "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
             }
-            stockProvider = new TwelveDataStockProvider(config.TwelveDataAPIKey);
-        }
-        else
-        {
-            throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
-                "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
+            return new TwelveDataStockProvider(config.TwelveDataAPIKey);
         }
 
-        return stockProvider;
+        throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
+            "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
     }
 
     static ICurrencyConverter SetupCurrencyConverter(AppConfig config)
     {
-        if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+        if (string.IsNullOrEmpty(config.ConversionAPI))
         {
-            throw new InvalidOperationException("Missing API key for TwelveData. " +
-                "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
+            throw new InvalidOperationException("A valid currency conversion API must be provided in the 'ConversionAPI' option" +
+                " of the config file. " +
+                "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_CONVERSION_APIS));
         }
-        return new TwelveDataCurrencyConverter(config!.TwelveDataAPIKey);
+
+        if (config.ConversionAPI == "twelvedata")
+        {
+            if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+            {
+                throw new InvalidOperationException("Missing API key for TwelveData. " +
+                    "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
+            }
+            return new TwelveDataCurrencyConverter(config!.TwelveDataAPIKey);
+        }
+
+        throw new InvalidOperationException("Unspecified or unsupported 'ConversionAPI'. " +
+            "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_CONVERSION_APIS));
     }
 
     static IEmailClient SetupEmailClient(AppConfig config)
@@ -142,7 +149,8 @@ class Program
             LowerBound = args.LowerBound,
             UpperBound = args.UpperBound,
             TargetStock = args.Stock,
-            CurrencyConverter = currencyConverter
+            CurrencyConverter = currencyConverter,
+            Currency = config.Currency
         };
 
         // Validate whether we have a 'To' address set before trying to

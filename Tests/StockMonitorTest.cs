@@ -21,7 +21,8 @@ namespace Tests
                 UpperBound = UPPERBOUND,
                 TargetStock = STOCK,
                 StockProvider = stockProvider,
-                CurrencyConverter = currencyConverter
+                CurrencyConverter = currencyConverter,
+                Currency = "USD"
             };
 
             int lowerbound = 0;
@@ -83,7 +84,8 @@ namespace Tests
                 UpperBound = UPPERBOUND,
                 TargetStock = STOCK,
                 StockProvider = stockProvider,
-                CurrencyConverter = new MockCurrencyConverter()
+                CurrencyConverter = new MockCurrencyConverter(),
+                Currency = "USD"
             };
 
             int lowerbound = 0;
@@ -124,6 +126,7 @@ namespace Tests
             // Setting the stock to a value within the interval must "reset"
             // the cooldown.
             stockProvider.StockPrice = 5;
+            stockProvider.Currency = "BRL";
             await stockMonitor.Poll();
 
             stockProvider.StockPrice = 10;

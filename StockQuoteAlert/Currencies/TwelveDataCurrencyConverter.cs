@@ -20,8 +20,7 @@ namespace StockQuoteAlert.Currencies
 
             if (fromCurrency == toCurrency)
             {
-                // TwelveData API already returns in USD, no need to
-                // request for a conversion rate.
+                // Redundant conversion, ignore.
                 return 1;
             }
 

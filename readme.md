@@ -79,8 +79,10 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 - `StockAPI` (string): The stock API of choice. Currently supported options are: `"twelvedata"`.
 
-#### Stock API Dependent fields
-If you choose the TwelveData API, you must also provide the following field:
+- `ConversionAPI` (string): The currency conversion API of choice. Currently supported options are: `"twelvedata"`.
+
+### Conditionally required fields
+If you choose the TwelveData API for either stock information or currency conversion, you must also provide the following field:
 - `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
 
 ### Optional Fields

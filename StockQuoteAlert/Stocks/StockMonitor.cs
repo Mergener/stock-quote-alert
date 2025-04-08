@@ -11,7 +11,7 @@ namespace StockQuoteAlert.Stocks
         public decimal UpperBound { get; init; }
         public required string TargetStock { get; init; }
         public required IStockProvider StockProvider { get; init; }
-        public string Currency { get; init; } = "USD";
+        public required string Currency { get; init; }
 
         /// <summary>
         /// A currency converter in case the stock provider API returns a currency
