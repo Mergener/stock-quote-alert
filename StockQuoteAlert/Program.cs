@@ -29,7 +29,7 @@ class Program
     {
         if (args.Length < 3)
         {
-            throw new ArgumentException("Usage: stock-alert.exe <stock-name> <lower-bound> <upper-bound> [config-file]");
+            throw new InvalidOperationException("Usage: stock-alert.exe <stock-name> <lower-bound> <upper-bound> [config-file]");
         }
 
         var parsed = new ParsedArgs(args[0].Trim(),
@@ -52,7 +52,7 @@ class Program
     {
         if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
         {
-            throw new ArgumentNullException("Missing \"TwelveDataAPIKey\" in configuration file.");
+            throw new InvalidOperationException("Missing \"TwelveDataAPIKey\" in configuration file.");
         }
         return new TwelveDataStockProvider(config.TwelveDataAPIKey!);
     }
@@ -60,7 +60,7 @@ class Program
     static IEmailClient SetupEmailClient(AppConfig config)
     {
         return new MailkitEmailClient(
-            config.SMTPHost ?? throw new Exception("No SMTP host found in config."),
+            config.SMTPHost ?? throw new InvalidOperationException("No SMTP host found in config."),
             config.SMTPPort,
             config.SMTPUsername,
             config.SMTPPassword,
@@ -87,10 +87,17 @@ class Program
             TargetStock = args.Stock
         };
 
+        // Validate whether we have a 'To' address set before trying to
+        // send emails.
+        if (string.IsNullOrEmpty(config.SMTPToAddress))
+        {
+            throw new InvalidOperationException("No SMTP 'to' address found in config.");
+        }
+
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress ?? throw new Exception("No SMTP 'to' address found in config."),
+                To: config.SMTPToAddress,
                 Subject: "Sell a stock!",
                 Content: $"Sell {stock}!\nLatest price: {price.ToMoney()} (at {DateTime.Now})"
             ));
@@ -99,7 +106,7 @@ class Program
         stockMonitor.PriceBelowLowerbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress ?? throw new Exception("No SMTP 'to' address found in config."),
+                To: config.SMTPToAddress,
                 Subject: "Buy a stock!",
                 Content: $"Buy {stock}!\nLatest price: {price.ToMoney()} (at {DateTime.Now})"
             ));
