@@ -1,4 +1,6 @@
-﻿namespace StockQuoteAlert.Stocks
+﻿using StockQuoteAlert.Currencies;
+
+namespace StockQuoteAlert.Stocks
 {
     public class StockMonitor
     {
@@ -9,6 +11,13 @@
         public decimal UpperBound { get; init; }
         public required string TargetStock { get; init; }
         public required IStockProvider StockProvider { get; init; }
+        public string Currency { get; init; } = "USD";
+
+        /// <summary>
+        /// A currency converter in case the stock provider API returns a currency
+        /// different than the one we want to work with.
+        /// </summary>
+        public required ICurrencyConverter CurrencyConverter { get; init; }
 
         /// <summary>
         /// An interval, in seconds, to prevent event spamming.
@@ -43,7 +52,10 @@
         {
             try
             {
-                var stockPrice = await StockProvider.GetLatestStockPrice(TargetStock);
+                var (stockPriceUnconverted, apiCurrency) = await StockProvider.GetLatestStockPrice(TargetStock);
+                var conversionRate = await CurrencyConverter.GetConversionRate(apiCurrency, Currency);
+
+                var stockPrice = stockPriceUnconverted * conversionRate;
 
                 DateTime pollTime = DateTime.Now;
                 PollResult pollResult = PollResult.None;

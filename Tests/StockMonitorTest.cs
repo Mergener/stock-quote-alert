@@ -152,21 +152,22 @@ namespace Tests
                 stockEnumerator.MoveNext();
             }
 
-            public Task<decimal> GetLatestStockPrice(string stockName, string currency)
+            public Task<(decimal, string)> GetLatestStockPrice(string stockName)
             {
                 var currentPrice = stockEnumerator.Current;
                 stockEnumerator.MoveNext();
-                return Task.FromResult(currentPrice);
+                return Task.FromResult((currentPrice, "USD"));
             }
         }
 
         class MockStockProvider : IStockProvider
         {
             public decimal StockPrice { get; set; }
+            public string Currency { get; set; } = "USD";
 
-            public Task<decimal> GetLatestStockPrice(string stockName, string currency)
+            public Task<(decimal, string)> GetLatestStockPrice(string stockName)
             {
-                return Task.FromResult(StockPrice);
+                return Task.FromResult((StockPrice, Currency));
             }
         }
     }

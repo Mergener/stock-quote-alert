@@ -1,4 +1,5 @@
 ﻿using StockQuoteAlert;
+using StockQuoteAlert.Currencies;
 using StockQuoteAlert.Emails;
 using StockQuoteAlert.Stocks;
 using System.Globalization;
@@ -12,10 +13,12 @@ class Program
             var parsedArgs = ParseArgs(args);
             var config = LoadConfigFromCLIArgs(parsedArgs);
             var stockProvider = SetupStockProvider(config);
+            var currencyConverter = SetupCurrencyConverter(config);
             var emailClient = SetupEmailClient(config);
             var stockMonitor = SetupMonitor(parsedArgs,
                                             config,
                                             stockProvider,
+                                            currencyConverter,
                                             emailClient);
 
             await RunMonitoringLoop(stockMonitor, parsedArgs, config);
@@ -100,6 +103,16 @@ class Program
         return stockProvider;
     }
 
+    static ICurrencyConverter SetupCurrencyConverter(AppConfig config)
+    {
+        if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+        {
+            throw new InvalidOperationException("Missing API key for TwelveData. " +
+                "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
+        }
+        return new TwelveDataCurrencyConverter(config!.TwelveDataAPIKey);
+    }
+
     static IEmailClient SetupEmailClient(AppConfig config)
     {
         return new MailkitEmailClient(
@@ -120,6 +133,7 @@ class Program
     static StockMonitor SetupMonitor(ParsedArgs args,
                                      AppConfig config,
                                      IStockProvider stockProvider,
+                                     ICurrencyConverter currencyConverter,
                                      IEmailClient emailClient)
     {
         var stockMonitor = new StockMonitor()
@@ -127,7 +141,8 @@ class Program
             StockProvider = stockProvider,
             LowerBound = args.LowerBound,
             UpperBound = args.UpperBound,
-            TargetStock = args.Stock
+            TargetStock = args.Stock,
+            CurrencyConverter = currencyConverter
         };
 
         // Validate whether we have a 'To' address set before trying to

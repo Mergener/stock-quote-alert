@@ -3,8 +3,8 @@
     public interface IStockProvider
     {
         /// <summary>
-        /// Fetches the latest price for the specified stock, in the specified currency.
+        /// Fetches the latest price for the specified stock and returns a (price, currency) tuple.
         /// </summary>
-        public Task<decimal> GetLatestStockPrice(string stockName, string currency = "USD");
+        public Task<(decimal, string)> GetLatestStockPrice(string stockName);
     }
 }
