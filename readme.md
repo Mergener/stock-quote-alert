@@ -32,7 +32,7 @@ StockQuoteAlert AAPL 150 200 path/to/config.json
 A configuration file is required to execute the program. It can also be used to override some default settings.
 
 A sample configuration file is provided in the repository as `sample-config.json`. 
-Create a copy of this file, rename it to sample-config.json and fill in any required fields.
+Create a copy of this file, rename it to sample-config.json and fill in any required fields or desired optional fields.
 
 ### Required Fields
 

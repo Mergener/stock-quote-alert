@@ -3,9 +3,5 @@
   "SMTPUsername": "your-email-username@your-email-provider.your-domain",
   "SMTPPassword": "your-smtp-password",
   "SMTPHost": "your-smtp-host",
-  "SMTPToAddress": "destination-email-address@some-email-provider.email-domain",
-  "SMTPPort": 587,
-  "SMTPSSL": false,
-  "MonitoringInterval": 10,
-  "EmailSpamInterval": 3600
+  "SMTPToAddress": "destination-email-address@some-email-provider.email-domain"
 }
