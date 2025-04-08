@@ -36,7 +36,7 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 ### Required Fields
 
-- `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
+- `RecipientAddress` (string): The email address where notifications will be sent.
 
 - `SMTPUsername` (string): Your email address used for sending notifications.
 
@@ -44,7 +44,7 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 - `SMTPHost` (string): The SMTP server address for your email provider. For example, for Gmail, it would be `smtp.gmail.com`.
 
-- `SMTPToAddress` (string): The email address where notifications will be sent.
+- `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
 
 ### Optional Fields
 
@@ -65,6 +65,8 @@ upperbound. The equivalent logic also applies to 'sell' emails. Defaults to `360
 - `SellEmailTemplatePath` (string): Path to a custom HTML email template for 'sell' emails. If not provided, a default template will be used.
 
 - `SellEmailSubject`: The subject text of 'buy' emails. Defaults to "Sell %%STOCK%%!"  if unspecified.
+
+- `SenderName`: How the sender's name will appear in the email. Defaults to "Stock Quote Alert System" if unspecified.
 
 - `RecipientName`: The name of the email recipient. Defaults to an empty value if unspecified.
 

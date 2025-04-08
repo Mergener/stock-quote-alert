@@ -21,14 +21,13 @@ namespace StockQuoteAlert
         public string? SMTPUsername { get; set; }
         public string? SMTPPassword { get; set; }
         public string? SMTPHost { get; set; }
-        public string SMTPFromName { get; set; } = string.Empty;
-        public string? SMTPToAddress { get; set; }
-
         public int SMTPPort { get; set; } = 587;
         public bool SMTPSSL { get; set; } = true;
         #endregion
 
         #region Email
+        public string SenderName { get; set; } = "Stock Quote Alert System";
+        public string? RecipientAddress { get; set; }
         public string RecipientName { get; set; } = "";
         public string BuyEmailSubject { get; set; } = "Buy %%STOCK%%!";
         public string? BuyEmailTemplatePath { get; set; } = null;
