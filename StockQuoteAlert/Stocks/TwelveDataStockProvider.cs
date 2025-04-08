@@ -10,9 +10,19 @@ namespace StockQuoteAlert.Stocks
         private readonly string apiKey;
         private bool disposedValue;
 
+        public async Task<decimal> GetLatestStockPrice(string stockName, string currency = "USD")
+        {
+            var conversionTask = GetConversionRate(currency);
+            var priceTask = GetLatestStockPriceUSD(stockName);
+
+            await Task.WhenAll(conversionTask, priceTask);
+
+            return priceTask.Result * conversionTask.Result;
+        }
+
         private record class GetPriceResponse([property: JsonPropertyName("price")] string Price);
 
-        public async Task<decimal> GetLatestStockPrice(string stockName)
+        private async Task<decimal> GetLatestStockPriceUSD(string stockName)
         {
             var resp = await httpClient.GetAsync($"/price?apikey={apiKey}&symbol={stockName}");
             resp.EnsureSuccessStatusCode();
@@ -38,6 +48,26 @@ namespace StockQuoteAlert.Stocks
                 throw new Exception($"Invalid price format returned from TwelveData API: '{body?.Price}'");
             }
             return price;
+        }
+
+        private record class CurrencyConversionResponse([property: JsonPropertyName("rate")] double Rate);
+
+        private async Task<decimal> GetConversionRate(string currency)
+        {
+            // Prevent any casing mistakes.
+            currency = currency.ToUpperInvariant();
+
+            if (currency == "USD")
+            {
+                // TwelveData API already returns in USD, no need to
+                // request for a conversion rate.
+                return 1;
+            }
+
+            var resp = await httpClient.GetAsync($"/currency_conversion?apikey={apiKey}&symbol=USD/{currency}");
+            resp.EnsureSuccessStatusCode();
+            var body = await resp.Content.ReadFromJsonAsync<CurrencyConversionResponse>();
+            return (decimal)body!.Rate;
         }
 
         public TwelveDataStockProvider(string apiKey)

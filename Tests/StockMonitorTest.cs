@@ -152,7 +152,7 @@ namespace Tests
                 stockEnumerator.MoveNext();
             }
 
-            public Task<decimal> GetLatestStockPrice(string stockName)
+            public Task<decimal> GetLatestStockPrice(string stockName, string currency)
             {
                 var currentPrice = stockEnumerator.Current;
                 stockEnumerator.MoveNext();
@@ -164,7 +164,7 @@ namespace Tests
         {
             public decimal StockPrice { get; set; }
 
-            public Task<decimal> GetLatestStockPrice(string stockName)
+            public Task<decimal> GetLatestStockPrice(string stockName, string currency)
             {
                 return Task.FromResult(StockPrice);
             }

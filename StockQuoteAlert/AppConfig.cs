@@ -13,7 +13,9 @@ namespace StockQuoteAlert
         public double EmailSpamInterval { get; set; } = 3600.0;
         #endregion
 
-        #region Stock API
+        #region Stocks
+        public string Currency { get; set; } = "USD";
+
         public static readonly string[] SUPPORTED_STOCK_APIS = [ "twelvedata" ];
         public string? StockAPI { get; set; }
 

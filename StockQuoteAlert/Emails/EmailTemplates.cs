@@ -56,17 +56,18 @@
         }
 
         public static string ApplySubstitutions(string template,
-                                                        string recipientName,
-                                                        string stock,
-                                                        decimal lowerbound,
-                                                        decimal upperbound,
-                                                        decimal price)
+                                                string recipientName,
+                                                string stock,
+                                                decimal lowerbound,
+                                                decimal upperbound,
+                                                decimal price,
+                                                string currency)
         {
             return template.Replace("%%NAME%%", recipientName)
                            .Replace("%%STOCK%%", stock)
-                           .Replace("%%LOWERBOUND%%", lowerbound.ToMoney())
-                           .Replace("%%UPPERBOUND%%", upperbound.ToMoney())
-                           .Replace("%%PRICE%%", price.ToMoney());
+                           .Replace("%%LOWERBOUND%%", lowerbound.ToMoney(currency))
+                           .Replace("%%UPPERBOUND%%", upperbound.ToMoney(currency))
+                           .Replace("%%PRICE%%", price.ToMoney(currency));
         }
     }
 }

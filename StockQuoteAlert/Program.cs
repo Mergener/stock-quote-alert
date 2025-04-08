@@ -149,13 +149,15 @@ class Program
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price),
+                                                           price,
+                                                           config.Currency),
                 Content: EmailTemplates.ApplySubstitutions(sellEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price)
+                                                           price,
+                                                           config.Currency)
             ));
             Console.WriteLine("Sent sell alert email.");
         };
@@ -168,13 +170,15 @@ class Program
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price),
+                                                           price,
+                                                           config.Currency),
                 Content: EmailTemplates.ApplySubstitutions(buyEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price)
+                                                           price,
+                                                           config.Currency)
             ));
             Console.WriteLine($"Sent purchase alert email.");
         };
@@ -189,8 +193,8 @@ class Program
                                         AppConfig config)
     {
         Console.WriteLine($"Monitoring stock {args.Stock}.");
-        Console.WriteLine($"Sell threshold: > {args.UpperBound.ToMoney()}");
-        Console.WriteLine($"Buy threshold: < {args.LowerBound.ToMoney()}");
+        Console.WriteLine($"Sell threshold: > {args.UpperBound.ToMoney(config.Currency)}");
+        Console.WriteLine($"Buy threshold: < {args.LowerBound.ToMoney(config.Currency)}");
         Console.WriteLine($"Notifications will be sent to {config.RecipientAddress}");
         Console.WriteLine();
 

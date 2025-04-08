@@ -25,15 +25,17 @@ namespace Tests
             const decimal UB = 20;
             const decimal LB = 10;
             const decimal PRICE = 25;
+            const string CURRENCY = "BRL";
 
             string formatted = EmailTemplates.ApplySubstitutions(SAMPLE_TEMPLATE,
                                                                  NAME,
                                                                  STOCK,
                                                                  LB,
                                                                  UB,
-                                                                 PRICE);
+                                                                 PRICE,
+                                                                 CURRENCY);
 
-            Assert.Equal($"{NAME} {STOCK} {UB.ToMoney()} {LB.ToMoney()} {PRICE.ToMoney()}", formatted);
+            Assert.Equal($"{NAME} {STOCK} {UB.ToMoney(CURRENCY)} {LB.ToMoney(CURRENCY)} {PRICE.ToMoney(CURRENCY)}", formatted);
         }
     }
 }
