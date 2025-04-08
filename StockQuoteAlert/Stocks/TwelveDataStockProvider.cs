@@ -40,9 +40,6 @@ namespace StockQuoteAlert.Stocks
             return price;
         }
 
-        public TwelveDataStockProvider()
-            : this(AppConfig.Active.TwelveDataAPIKey!) { }
-
         public TwelveDataStockProvider(string apiKey)
         {
             if (apiKey is null)

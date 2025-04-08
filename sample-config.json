@@ -6,5 +6,6 @@
   "SMTPToAddress": "destination-email-address@some-email-provider.email-domain",
   "SMTPPort": 587,
   "SMTPSSL": false,
-  "MonitoringInterval": 10
+  "MonitoringInterval": 10,
+  "EmailSpamInterval": 3600
 }

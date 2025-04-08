@@ -4,6 +4,130 @@ namespace Tests
 {
     public class StockMonitorTest
     {
+        [Fact]
+        public async Task TestEvents()
+        {
+            var stockProvider = new StockProvider639();
+
+            const int LOWERBOUND = 4;
+            const int UPPERBOUND = 8;
+            const string STOCK = "AAPL";
+
+            StockMonitor stockMonitor = new()
+            {
+                LowerBound = LOWERBOUND,
+                UpperBound = UPPERBOUND,
+                TargetStock = STOCK,
+                StockProvider = stockProvider,
+            };
+
+            bool calledLowerbound = false;
+            bool calledUpperbound = false;
+
+            stockMonitor.PriceBelowLowerbound += (string stock, decimal price) =>
+            {
+                Assert.True(price < LOWERBOUND);
+                Assert.Equal(STOCK, stock);
+                calledLowerbound = true;
+            };
+
+            stockMonitor.PriceAboveUpperbound += (string stock, decimal price) =>
+            {
+                Assert.True(price > UPPERBOUND);
+                Assert.Equal(STOCK, stock);
+                calledUpperbound = true;
+            };
+
+            // First call returns 6, which is within our expected interval.
+            await stockMonitor.Poll();
+            Assert.False(calledLowerbound);
+            Assert.False(calledUpperbound);
+
+            // Now, it should return 3, which is below our lowerbound.
+            await stockMonitor.Poll();
+            Assert.True(calledLowerbound);
+            Assert.False(calledUpperbound);
+            calledLowerbound = false;
+
+            // Now, it should return 9, which is above our upperbound.
+            await stockMonitor.Poll();
+            Assert.False(calledLowerbound);
+            Assert.True(calledUpperbound);
+            calledUpperbound = false;
+        }
+
+        [Fact]
+        public async Task TestCooldown()
+        {
+            var stockProvider = new MockStockProvider();
+
+            const int LOWERBOUND = 4;
+            const int UPPERBOUND = 8;
+            const string STOCK = "AAPL";
+
+            var stockMonitor = new StockMonitor()
+            {
+                LowerBound = LOWERBOUND,
+                UpperBound = UPPERBOUND,
+                TargetStock = STOCK,
+                StockProvider = stockProvider,
+            };
+
+            int lowerbound = 0;
+            stockMonitor.PriceBelowLowerbound += (string stock, decimal price) =>
+            {
+                lowerbound++;
+            };
+
+            int upperbound = 0;
+            stockMonitor.PriceAboveUpperbound += (string stock, decimal price) =>
+            {
+                upperbound++;
+            };
+
+            stockProvider.StockPrice = 10;
+
+            // Test with no cooldown.
+            // Here, every Poll() must invoke its respective event.
+            await stockMonitor.Poll();
+            Assert.Equal(1, upperbound);
+            await stockMonitor.Poll();
+            Assert.Equal(2, upperbound);
+
+            stockProvider.StockPrice = 0;
+
+            await stockMonitor.Poll();
+            Assert.Equal(1, lowerbound);
+            await stockMonitor.Poll();
+            Assert.Equal(2, lowerbound);
+
+            // Now, test with 'infinite' cooldown.
+            // Events must only be invoked when the stock price
+            // changes its place in the interval.
+            stockMonitor.EventCooldown = 100000000.0;
+            lowerbound = 0;
+            upperbound = 0;
+
+            // Setting the stock to a value within the interval must "reset"
+            // the cooldown.
+            stockProvider.StockPrice = 5;
+            await stockMonitor.Poll();
+
+            stockProvider.StockPrice = 10;
+            await stockMonitor.Poll();
+            Assert.Equal(1, upperbound);
+
+            await stockMonitor.Poll();
+            Assert.Equal(1, upperbound);
+
+            stockProvider.StockPrice = 0;
+            await stockMonitor.Poll();
+            Assert.Equal(1, lowerbound);
+
+            await stockMonitor.Poll();
+            Assert.Equal(1, lowerbound);
+        }
+
         /// <summary>
         /// A pseudo stock provider that returns the repeating
         /// sequence 6, 3, 9, 6, 3, 9, 6... as the stock price.
@@ -36,54 +160,14 @@ namespace Tests
             }
         }
 
-        [Fact]
-        public async Task TestStockMonitor()
+        class MockStockProvider : IStockProvider
         {
-            IStockProvider stockProvider = new StockProvider639();
+            public decimal StockPrice { get; set; }
 
-            const int LOWERBOUND = 4;
-            const int UPPERBOUND = 8;
-            const string STOCK = "AAPL";
-
-            StockMonitor stockMonitor = new()
+            public Task<decimal> GetLatestStockPrice(string stockName)
             {
-                LowerBound = LOWERBOUND,
-                UpperBound = UPPERBOUND,
-                TargetStock = STOCK,
-                StockProvider = stockProvider,
-            };
-
-            bool calledLowerbound = false;
-            bool calledUpperbound = false;
-
-            stockMonitor.PriceBelowLowerbound += (string stock, decimal price) => {
-                Assert.True(price < LOWERBOUND);
-                Assert.Equal(STOCK, stock);
-                calledLowerbound = true;
-            };
-
-            stockMonitor.PriceAboveUpperbound += (string stock, decimal price) => {
-                Assert.True(price > UPPERBOUND);
-                Assert.Equal(STOCK, stock);
-                calledUpperbound = true;
-            };
-
-            // First call returns 6, which is within our expected interval.
-            await stockMonitor.Poll();
-            Assert.False(calledLowerbound);
-            Assert.False(calledUpperbound);
-
-            // Now, it should return 3, which is below our lowerbound.
-            await stockMonitor.Poll();
-            Assert.True(calledLowerbound);
-            Assert.False(calledUpperbound);
-            calledLowerbound = false;
-
-            // Now, it should return 9, which is above our upperbound.
-            await stockMonitor.Poll();
-            Assert.False(calledLowerbound);
-            Assert.True(calledUpperbound);
-            calledUpperbound = false;
+                return Task.FromResult(StockPrice);
+            }
         }
     }
 }
