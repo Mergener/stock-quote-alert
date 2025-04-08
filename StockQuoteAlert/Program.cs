@@ -113,7 +113,7 @@ class Program
             Console.WriteLine($"Sent purchase alert email.");
         };
 
-        stockMonitor.EventCooldown = config.MonitoringInterval;
+        stockMonitor.EventCooldown = config.EmailSpamInterval;
 
         return stockMonitor;
     }
