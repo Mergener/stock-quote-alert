@@ -1,6 +1,6 @@
 ﻿namespace StockQuoteAlert
 {
-    internal static class Utils
+    public static class Utils
     {
         public static string ToMoney(this decimal value, string currency = "USD")
         {

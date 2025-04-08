@@ -7,9 +7,8 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        ParsedArgs parsedArgs = ParseArgs(args);
-        AppConfig config = LoadConfigFromCLIArgs(parsedArgs);
-
+        var parsedArgs = ParseArgs(args);
+        var config = LoadConfigFromCLIArgs(parsedArgs);
         var stockProvider = SetupStockProvider(config);
         var emailClient = SetupEmailClient(config);
         var stockMonitor = SetupMonitor(parsedArgs,
@@ -42,7 +41,7 @@ class Program
 
     static AppConfig LoadConfigFromCLIArgs(ParsedArgs args)
     {
-        string configPath = args.ConfigPath ?? "config.json";
+        var configPath = args.ConfigPath ?? "config.json";
         var config = AppConfig.LoadFromFile(configPath);
         Console.WriteLine($"Successfully loaded config from {configPath}.");
         return config;
@@ -94,21 +93,44 @@ class Program
             throw new InvalidOperationException("No SMTP 'to' address found in config.");
         }
 
+        string buyEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.BuyEmailTemplatePath, true);
+        string sellEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.SellEmailTemplatePath, false);
+
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress,
-                Subject: "Sell a stock!",
-                Content: $"Sell {stock}!\nLatest price: {price.ToMoney()} (at {DateTime.Now})"
+                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                Subject: EmailTemplates.ApplySubstitutions(config.SellEmailSubject,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price),
+                Content: EmailTemplates.ApplySubstitutions(sellEmailTemplate,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price)
             ));
             Console.WriteLine("Sent sell alert email.");
         };
         stockMonitor.PriceBelowLowerbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress,
-                Subject: "Buy a stock!",
-                Content: $"Buy {stock}!\nLatest price: {price.ToMoney()} (at {DateTime.Now})"
+                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                Subject: EmailTemplates.ApplySubstitutions(config.BuyEmailSubject,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price),
+                Content: EmailTemplates.ApplySubstitutions(buyEmailTemplate,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price)
             ));
             Console.WriteLine($"Sent purchase alert email.");
         };

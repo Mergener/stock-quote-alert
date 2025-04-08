@@ -32,7 +32,7 @@ StockQuoteAlert AAPL 150 200 path/to/config.json
 A configuration file is required to execute the program. It can also be used to override some default settings.
 
 A sample configuration file is provided in the repository as `sample-config.json`. 
-Create a copy of this file, rename it to sample-config.json and fill in any required fields.
+Create a copy of this file, rename it to sample-config.json and fill in any required fields or desired optional fields.
 
 ### Required Fields
 
@@ -57,3 +57,24 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 - `EmailSpamInterval` (int): An interval, in seconds, to prevent email spam. This interval works as follows: if a 'buy' email is sent, no other 'buy' emaill will be sent
 until either this interval ends or the price drops below the
 upperbound. The equivalent logic also applies to 'sell' emails. Defaults to `3600` (1 hour) if unspecified.
+
+- `BuyEmailTemplatePath` (string): Path to a custom HTML email template for 'buy' emails. If not provided, a default template will be used.
+
+- `BuyEmailSubject` (string): The subject text of 'buy' emails. Defaults to "Buy %%STOCK%%!"  if unspecified.
+
+- `SellEmailTemplatePath` (string): Path to a custom HTML email template for 'sell' emails. If not provided, a default template will be used.
+
+- `SellEmailSubject`: The subject text of 'buy' emails. Defaults to "Sell %%STOCK%%!"  if unspecified.
+
+- `RecipientName`: The name of the email recipient. Defaults to an empty value if unspecified.
+
+## Email Templates
+
+A custom email template can be provided in the configuration file for both 'buy' and 'sell' emails. The template must be an HTML file.
+The following placeholders will be replaced with actual values when the email is sent:
+
+- `%%STOCK%%`: The name of the stock being monitored.
+- `%%PRICE%%`: The current price of the stock.
+- `%%UPPERBOUND%%`: The upper price limit set for the stock.
+- `%%LOWERBOUND%%`: The lower price limit set for the stock.
+- `%%NAME%%`: The name of the email recipient (as in `RecipientName`)
