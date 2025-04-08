@@ -42,10 +42,7 @@ namespace StockQuoteAlert.Stocks
 
         public TwelveDataStockProvider(string apiKey)
         {
-            if (apiKey is null)
-            {
-                throw new ArgumentNullException("Api Key cannot be null.");
-            }
+            ArgumentNullException.ThrowIfNull(apiKey);
 
             this.apiKey = apiKey;
             httpClient.BaseAddress = new Uri("https://api.twelvedata.com/");
