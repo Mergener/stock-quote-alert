@@ -69,6 +69,8 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 ### Required Fields
 
+- `Currency` (string): The currency in which the stock price is displayed.
+
 - `RecipientAddress` (string): The email address where notifications will be sent.
 
 - `SMTPUsername` (string): Your email address used for sending notifications.
@@ -86,8 +88,6 @@ If you choose the TwelveData API for either stock information or currency conver
 - `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
 
 ### Optional Fields
-
-- `Currency` (string): The currency in which the stock price is displayed. Defaults to `USD` if unspecified.
 
 - `MonitoringInterval` (int): Interval, in seconds, between each stock price check. Defaults to `10` if unspecified.
 

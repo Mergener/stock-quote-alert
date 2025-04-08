@@ -106,6 +106,11 @@ class Program
                 "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_CONVERSION_APIS));
         }
 
+        if (string.IsNullOrEmpty(config.Currency))
+        {
+            throw new InvalidOperationException("No currency specified in configuration file. Specify one with the 'Currency' option.");
+        }
+
         if (config.ConversionAPI == "twelvedata")
         {
             if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
@@ -143,6 +148,16 @@ class Program
                                      ICurrencyConverter currencyConverter,
                                      IEmailClient emailClient)
     {
+        // Validate whether we have a 'To' address set before trying to
+        // send emails.
+        if (string.IsNullOrEmpty(config.RecipientAddress))
+        {
+            throw new InvalidOperationException("No recipient address found in config.");
+        }
+
+        string buyEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.BuyEmailTemplatePath, true);
+        string sellEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.SellEmailTemplatePath, false);
+
         var stockMonitor = new StockMonitor()
         {
             StockProvider = stockProvider,
@@ -150,18 +165,8 @@ class Program
             UpperBound = args.UpperBound,
             TargetStock = args.Stock,
             CurrencyConverter = currencyConverter,
-            Currency = config.Currency
+            Currency = config.Currency!
         };
-
-        // Validate whether we have a 'To' address set before trying to
-        // send emails.
-        if (string.IsNullOrEmpty(config.RecipientAddress))
-        {
-            throw new InvalidOperationException("No SMTP 'to' address found in config.");
-        }
-
-        string buyEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.BuyEmailTemplatePath, true);
-        string sellEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.SellEmailTemplatePath, false);
 
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {

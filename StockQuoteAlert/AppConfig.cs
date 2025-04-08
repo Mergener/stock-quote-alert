@@ -14,7 +14,7 @@ namespace StockQuoteAlert
         #endregion
 
         #region Currency
-        public string Currency { get; set; } = "USD";
+        public string? Currency { get; set; }
 
         public static readonly string[] SUPPORTED_CONVERSION_APIS = ["twelvedata"];
         public string? ConversionAPI { get; set; }
