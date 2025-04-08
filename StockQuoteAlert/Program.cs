@@ -32,8 +32,8 @@ class Program
         }
 
         var parsed = new ParsedArgs(args[0].Trim(),
-                                    decimal.Parse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture),
-                                    decimal.Parse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture),
+                                    decimal.Parse(args[2].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
+                                    decimal.Parse(args[1].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
                                     args.Length >= 4 ? args[3] : null);
 
         return parsed;
@@ -71,7 +71,7 @@ class Program
         else
         {
             throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
-                "Valid options are " + AppConfig.SUPPORTED_STOCK_APIS);
+                "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
         }
 
         return stockProvider;
