@@ -29,12 +29,12 @@ class Program
     {
         if (args.Length < 3)
         {
-            throw new InvalidOperationException("Usage: stock-alert.exe <stock-name> <lower-bound> <upper-bound> [config-file]");
+            throw new InvalidOperationException("Usage: stock-alert.exe <stock-name> <upper-bound> <lower-bound> [config-file]");
         }
 
         var parsed = new ParsedArgs(args[0].Trim(),
-                                    decimal.Parse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture),
                                     decimal.Parse(args[2], NumberStyles.Number, CultureInfo.InvariantCulture),
+                                    decimal.Parse(args[1], NumberStyles.Number, CultureInfo.InvariantCulture),
                                     args.Length >= 4 ? args[3] : null);
 
         return parsed;
