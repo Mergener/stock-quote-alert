@@ -8,9 +8,28 @@ Conversely, when the price drops below the lowerbound, a 'buy' email is sent.
 ## Prerequisites
 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 
+## Building
+
+### Via dotnet CLI
+
+To build the project, navigate to the project directory and run the following command:
+
+```
+dotnet build -c <Debug|Release>
+```
+
+### Via Visual Studio
+Simply launching Visual Studio and opening the solution file will handle dependencies and build the project.
+
+Note that you need to specify command line arguments in the project Debug properties in order to properly run the program.
+
+No Visual Studio versions below VS 2022 were tested.
+
+This will create an executable file in the `bin/Debug|Release/net8.0` directory.
+
 ## Usage
 
-Once built, run:
+Once built `cd` to the executable directory and run:
 
 ```bash
 StockQuoteAlert <stock-name> <upperbound> <lowerbound> [config]
@@ -18,14 +37,17 @@ StockQuoteAlert <stock-name> <upperbound> <lowerbound> [config]
 
 Where:
 - `stock-name`: The name of the stock you want to monitor (e.g., `AAPL` for Apple).
-- `upperbound`: The upper price limit for the stock.
-- `lowerbound`: The lower price limit for the stock.
+- `upperbound`: The upper price limit (in USD) for the stock.
+- `lowerbound`: The lower price limit (in USD) for the stock.
 - `config`: Optional. The path to the configuration file. If not provided, the program will look for a file named `config.json` in the working directory.
 
 Example:
 ```bash
 StockQuoteAlert AAPL 150 200 path/to/config.json
 ```
+
+Note that the program **requires** a valid configuration file that
+specifies at least some required options. See the section below.
 
 ## Configuration
 
