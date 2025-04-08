@@ -101,12 +101,12 @@ class Program
             await emailClient.SendEmail(new SendEmailArgs(
                 To: config.SMTPToAddress,
                 Subject: config.SellEmailSubject,
-                Content: EmailTemplates.ApplyTemplateSubstitutions(sellEmailTemplate,
-                                                                   config.RecipientName ?? string.Empty,
-                                                                   stock,
-                                                                   args.LowerBound,
-                                                                   args.UpperBound,
-                                                                   price)
+                Content: EmailTemplates.ApplySubstitutions(sellEmailTemplate,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price)
             ));
             Console.WriteLine("Sent sell alert email.");
         };
@@ -115,12 +115,12 @@ class Program
             await emailClient.SendEmail(new SendEmailArgs(
                 To: config.SMTPToAddress,
                 Subject: config.BuyEmailSubject,
-                Content: EmailTemplates.ApplyTemplateSubstitutions(buyEmailTemplate,
-                                                                   config.RecipientName ?? string.Empty,
-                                                                   stock,
-                                                                   args.LowerBound,
-                                                                   args.UpperBound,
-                                                                   price)
+                Content: EmailTemplates.ApplySubstitutions(buyEmailTemplate,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price)
             ));
             Console.WriteLine($"Sent purchase alert email.");
         };

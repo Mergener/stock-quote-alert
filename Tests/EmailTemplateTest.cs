@@ -1,4 +1,5 @@
 ﻿using StockQuoteAlert;
+using StockQuoteAlert.Emails;
 
 namespace Tests
 {
@@ -25,12 +26,12 @@ namespace Tests
             const decimal LB = 10;
             const decimal PRICE = 25;
 
-            string formatted = EmailTemplates.ApplyTemplateSubstitutions(SAMPLE_TEMPLATE,
-                                                                         NAME,
-                                                                         STOCK,
-                                                                         LB,
-                                                                         UB,
-                                                                         PRICE);
+            string formatted = EmailTemplates.ApplySubstitutions(SAMPLE_TEMPLATE,
+                                                                 NAME,
+                                                                 STOCK,
+                                                                 LB,
+                                                                 UB,
+                                                                 PRICE);
 
             Assert.Equal($"{NAME} {STOCK} {UB.ToMoney()} {LB.ToMoney()} {PRICE.ToMoney()}", formatted);
         }
