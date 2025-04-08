@@ -51,7 +51,7 @@ class Program
     {
         if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
         {
-            throw new InvalidOperationException("Missing \"TwelveDataAPIKey\" in configuration file.");
+            throw new InvalidOperationException("Missing 'TwelveDataAPIKey' in configuration file.");
         }
         return new TwelveDataStockProvider(config.TwelveDataAPIKey!);
     }
@@ -67,8 +67,8 @@ class Program
             )
         {
             From = new EmailAddress(
-            config.SMTPFromName,
-                config.SMTPUsername ?? throw new Exception("No SMTP 'from' address found in config.")
+                config.SMTPUsername ?? throw new Exception("No 'SMTPUsername' found in config."),
+                config.SenderName
             )
         };
     }
@@ -88,7 +88,7 @@ class Program
 
         // Validate whether we have a 'To' address set before trying to
         // send emails.
-        if (string.IsNullOrEmpty(config.SMTPToAddress))
+        if (string.IsNullOrEmpty(config.RecipientAddress))
         {
             throw new InvalidOperationException("No SMTP 'to' address found in config.");
         }
@@ -99,7 +99,7 @@ class Program
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                To: new EmailAddress(config.RecipientAddress, config.RecipientName),
                 Subject: EmailTemplates.ApplySubstitutions(config.SellEmailSubject,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
@@ -118,7 +118,7 @@ class Program
         stockMonitor.PriceBelowLowerbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                To: new EmailAddress(config.RecipientAddress, config.RecipientName),
                 Subject: EmailTemplates.ApplySubstitutions(config.BuyEmailSubject,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
@@ -147,7 +147,7 @@ class Program
         Console.WriteLine($"Monitoring stock {args.Stock}.");
         Console.WriteLine($"Sell threshold: > {args.UpperBound.ToMoney()}");
         Console.WriteLine($"Buy threshold: < {args.LowerBound.ToMoney()}");
-        Console.WriteLine($"Notifications will be sent to {config.SMTPToAddress}");
+        Console.WriteLine($"Notifications will be sent to {config.RecipientAddress}");
         Console.WriteLine();
 
         while (true)
