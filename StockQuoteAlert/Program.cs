@@ -5,18 +5,27 @@ using System.Globalization;
 
 class Program
 {
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        var parsedArgs = ParseArgs(args);
-        var config = LoadConfigFromCLIArgs(parsedArgs);
-        var stockProvider = SetupStockProvider(config);
-        var emailClient = SetupEmailClient(config);
-        var stockMonitor = SetupMonitor(parsedArgs,
-                                        config,
-                                        stockProvider,
-                                        emailClient);
+        try
+        {
+            var parsedArgs = ParseArgs(args);
+            var config = LoadConfigFromCLIArgs(parsedArgs);
+            var stockProvider = SetupStockProvider(config);
+            var emailClient = SetupEmailClient(config);
+            var stockMonitor = SetupMonitor(parsedArgs,
+                                            config,
+                                            stockProvider,
+                                            emailClient);
 
-        await RunMonitoringLoop(stockMonitor, parsedArgs, config);
+            await RunMonitoringLoop(stockMonitor, parsedArgs, config);
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Fatal: {ex.Message}");
+            return -1;
+        }
     }
 
     record ParsedArgs(string Stock,
@@ -28,23 +37,37 @@ class Program
     {
         if (args.Length < 3)
         {
-            throw new InvalidOperationException("Usage: stock-alert.exe <stock-name> <upper-bound> <lower-bound> [config-file]");
+            throw new InvalidOperationException("Incorrect usage. Expected:\n\tstock-alert.exe <stock-name> <upper-bound> <lower-bound> [config-file]");
         }
 
-        var parsed = new ParsedArgs(args[0].Trim(),
-                                    decimal.Parse(args[2].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
-                                    decimal.Parse(args[1].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
-                                    args.Length >= 4 ? args[3] : null);
+        try
+        {
+            var parsed = new ParsedArgs(args[0].Trim(),
+                                        decimal.Parse(args[2].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
+                                        decimal.Parse(args[1].Replace(',', '.'), NumberStyles.Number, CultureInfo.InvariantCulture),
+                                        args.Length >= 4 ? args[3] : null);
 
-        return parsed;
+            return parsed;
+        }
+        catch
+        {
+            throw new Exception("Invalid upperbound/lowerbound price format.");
+        }
     }
 
     static AppConfig LoadConfigFromCLIArgs(ParsedArgs args)
     {
-        var configPath = args.ConfigPath ?? "config.json";
-        var config = AppConfig.LoadFromFile(configPath);
-        Console.WriteLine($"Successfully loaded config from {configPath}.");
-        return config;
+        try
+        {
+            var configPath = args.ConfigPath ?? "config.json";
+            var config = AppConfig.LoadFromFile(configPath);
+            Console.WriteLine($"Successfully loaded config from {configPath}.");
+            return config;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to load configuration file: {ex.Message}");
+        }
     }
 
     static IStockProvider SetupStockProvider(AppConfig config)
@@ -64,7 +87,7 @@ class Program
             if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
             {
                 throw new InvalidOperationException("Missing API key for TwelveData. " +
-                    "Specify one with the 'TwelveDataAPIKey' option in the config file.");
+                    "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
             }
             stockProvider = new TwelveDataStockProvider(config.TwelveDataAPIKey);
         }
@@ -80,7 +103,7 @@ class Program
     static IEmailClient SetupEmailClient(AppConfig config)
     {
         return new MailkitEmailClient(
-            config.SMTPHost ?? throw new InvalidOperationException("No SMTP host found in config."),
+            config.SMTPHost ?? throw new InvalidOperationException("No SMTP host found in configuration file."),
             config.SMTPPort,
             config.SMTPUsername,
             config.SMTPPassword,
@@ -88,7 +111,7 @@ class Program
             )
         {
             From = new EmailAddress(
-                config.SMTPUsername ?? throw new Exception("No 'SMTPUsername' found in config."),
+                config.SMTPUsername ?? throw new Exception("No SMTP username found in configuration file."),
                 config.SenderName
             )
         };
