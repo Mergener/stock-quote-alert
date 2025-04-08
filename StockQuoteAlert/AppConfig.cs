@@ -13,14 +13,20 @@ namespace StockQuoteAlert
         public double EmailSpamInterval { get; set; } = 3600.0;
         #endregion
 
-        #region Stock API
-        public static readonly string[] SUPPORTED_STOCK_APIS = [ "twelvedata" ];
+        #region Currency
+        public string? Currency { get; set; }
+
+        public static readonly string[] SUPPORTED_CONVERSION_APIS = ["twelvedata"];
+        public string? ConversionAPI { get; set; }
+        #endregion
+
+        #region Stocks
+        public static readonly string[] SUPPORTED_STOCK_APIS = ["twelvedata"];
         public string? StockAPI { get; set; }
+        #endregion
 
         #region Twelve Data
         public string? TwelveDataAPIKey { get; set; }
-        #endregion
-
         #endregion
 
         #region SMTP

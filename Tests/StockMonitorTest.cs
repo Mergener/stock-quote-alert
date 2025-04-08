@@ -1,3 +1,4 @@
+using StockQuoteAlert.Currencies;
 using StockQuoteAlert.Stocks;
 
 namespace Tests
@@ -8,6 +9,7 @@ namespace Tests
         public async Task TestEvents()
         {
             var stockProvider = new StockProvider639();
+            var currencyConverter = new MockCurrencyConverter();
 
             const int LOWERBOUND = 4;
             const int UPPERBOUND = 8;
@@ -19,41 +21,52 @@ namespace Tests
                 UpperBound = UPPERBOUND,
                 TargetStock = STOCK,
                 StockProvider = stockProvider,
+                CurrencyConverter = currencyConverter,
+                Currency = "USD"
             };
 
-            bool calledLowerbound = false;
-            bool calledUpperbound = false;
+            int lowerbound = 0;
+            int upperbound = 0;
+
+            int expectedLowerbound = 0;
+            int expectedUpperbound = 0;
 
             stockMonitor.PriceBelowLowerbound += (string stock, decimal price) =>
             {
                 Assert.True(price < LOWERBOUND);
                 Assert.Equal(STOCK, stock);
-                calledLowerbound = true;
+                lowerbound++;
             };
 
             stockMonitor.PriceAboveUpperbound += (string stock, decimal price) =>
             {
                 Assert.True(price > UPPERBOUND);
                 Assert.Equal(STOCK, stock);
-                calledUpperbound = true;
+                upperbound++;
             };
 
             // First call returns 6, which is within our expected interval.
             await stockMonitor.Poll();
-            Assert.False(calledLowerbound);
-            Assert.False(calledUpperbound);
+            Assert.Equal(expectedLowerbound, lowerbound);
+            Assert.Equal(expectedUpperbound, upperbound);
 
             // Now, it should return 3, which is below our lowerbound.
             await stockMonitor.Poll();
-            Assert.True(calledLowerbound);
-            Assert.False(calledUpperbound);
-            calledLowerbound = false;
+            Assert.Equal(++expectedLowerbound, lowerbound);
+            Assert.Equal(expectedUpperbound, upperbound);
 
             // Now, it should return 9, which is above our upperbound.
             await stockMonitor.Poll();
-            Assert.False(calledLowerbound);
-            Assert.True(calledUpperbound);
-            calledUpperbound = false;
+            Assert.Equal(expectedLowerbound, lowerbound);
+            Assert.Equal(++expectedUpperbound, upperbound);
+
+            // Sequence now returns to 6. However, we'll set our conversion
+            // rate to 0.5. With this conversion rate, we expect the stock
+            // price to be 3, which is below our lowerbound.
+            currencyConverter.ConversionRate = 0.5m;
+            await stockMonitor.Poll();
+            Assert.Equal(++expectedLowerbound, lowerbound);
+            Assert.Equal(expectedUpperbound, upperbound);
         }
 
         [Fact]
@@ -71,6 +84,8 @@ namespace Tests
                 UpperBound = UPPERBOUND,
                 TargetStock = STOCK,
                 StockProvider = stockProvider,
+                CurrencyConverter = new MockCurrencyConverter(),
+                Currency = "USD"
             };
 
             int lowerbound = 0;
@@ -111,6 +126,7 @@ namespace Tests
             // Setting the stock to a value within the interval must "reset"
             // the cooldown.
             stockProvider.StockPrice = 5;
+            stockProvider.Currency = "BRL";
             await stockMonitor.Poll();
 
             stockProvider.StockPrice = 10;
@@ -152,21 +168,32 @@ namespace Tests
                 stockEnumerator.MoveNext();
             }
 
-            public Task<decimal> GetLatestStockPrice(string stockName)
+            public Task<(decimal, string)> GetLatestStockPrice(string stockName)
             {
                 var currentPrice = stockEnumerator.Current;
                 stockEnumerator.MoveNext();
-                return Task.FromResult(currentPrice);
+                return Task.FromResult((currentPrice, "USD"));
             }
         }
 
         class MockStockProvider : IStockProvider
         {
             public decimal StockPrice { get; set; }
+            public string Currency { get; set; } = "USD";
 
-            public Task<decimal> GetLatestStockPrice(string stockName)
+            public Task<(decimal, string)> GetLatestStockPrice(string stockName)
             {
-                return Task.FromResult(StockPrice);
+                return Task.FromResult((StockPrice, Currency));
+            }
+        }
+
+        class MockCurrencyConverter : ICurrencyConverter
+        {
+            public decimal ConversionRate { get; set; } = 1;
+
+            public Task<decimal> GetConversionRate(string fromCurrency, string toCurrency)
+            {
+                return Task.FromResult(ConversionRate);
             }
         }
     }

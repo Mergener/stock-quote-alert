@@ -1,4 +1,5 @@
 ﻿using StockQuoteAlert;
+using StockQuoteAlert.Currencies;
 using StockQuoteAlert.Emails;
 using StockQuoteAlert.Stocks;
 using System.Globalization;
@@ -12,10 +13,12 @@ class Program
             var parsedArgs = ParseArgs(args);
             var config = LoadConfigFromCLIArgs(parsedArgs);
             var stockProvider = SetupStockProvider(config);
+            var currencyConverter = SetupCurrencyConverter(config);
             var emailClient = SetupEmailClient(config);
             var stockMonitor = SetupMonitor(parsedArgs,
                                             config,
                                             stockProvider,
+                                            currencyConverter,
                                             emailClient);
 
             await RunMonitoringLoop(stockMonitor, parsedArgs, config);
@@ -79,8 +82,6 @@ class Program
                 "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
         }
 
-        IStockProvider stockProvider;
-
         if (config.StockAPI == "twelvedata")
         {
             // Check for API key.
@@ -89,15 +90,39 @@ class Program
                 throw new InvalidOperationException("Missing API key for TwelveData. " +
                     "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
             }
-            stockProvider = new TwelveDataStockProvider(config.TwelveDataAPIKey);
-        }
-        else
-        {
-            throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
-                "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
+            return new TwelveDataStockProvider(config.TwelveDataAPIKey);
         }
 
-        return stockProvider;
+        throw new InvalidOperationException("Unspecified or unsupported 'StockAPI'. " +
+            "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_STOCK_APIS));
+    }
+
+    static ICurrencyConverter SetupCurrencyConverter(AppConfig config)
+    {
+        if (string.IsNullOrEmpty(config.ConversionAPI))
+        {
+            throw new InvalidOperationException("A valid currency conversion API must be provided in the 'ConversionAPI' option" +
+                " of the config file. " +
+                "Valid options are: " + string.Join(", ", AppConfig.SUPPORTED_CONVERSION_APIS));
+        }
+
+        if (string.IsNullOrEmpty(config.Currency))
+        {
+            throw new InvalidOperationException("No currency specified in configuration file. Specify one with the 'Currency' option.");
+        }
+
+        if (config.ConversionAPI == "twelvedata")
+        {
+            if (string.IsNullOrEmpty(config.TwelveDataAPIKey))
+            {
+                throw new InvalidOperationException("Missing API key for TwelveData. " +
+                    "Specify one with the 'TwelveDataAPIKey' option in the configuration file.");
+            }
+            return new TwelveDataCurrencyConverter(config!.TwelveDataAPIKey);
+        }
+
+        throw new InvalidOperationException("Unspecified or unsupported 'ConversionAPI'. " +
+            "Valid options are " + string.Join(", ", AppConfig.SUPPORTED_CONVERSION_APIS));
     }
 
     static IEmailClient SetupEmailClient(AppConfig config)
@@ -120,25 +145,28 @@ class Program
     static StockMonitor SetupMonitor(ParsedArgs args,
                                      AppConfig config,
                                      IStockProvider stockProvider,
+                                     ICurrencyConverter currencyConverter,
                                      IEmailClient emailClient)
     {
+        // Validate whether we have a 'To' address set before trying to
+        // send emails.
+        if (string.IsNullOrEmpty(config.RecipientAddress))
+        {
+            throw new InvalidOperationException("No recipient address found in config.");
+        }
+
+        string buyEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.BuyEmailTemplatePath, true);
+        string sellEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.SellEmailTemplatePath, false);
+
         var stockMonitor = new StockMonitor()
         {
             StockProvider = stockProvider,
             LowerBound = args.LowerBound,
             UpperBound = args.UpperBound,
-            TargetStock = args.Stock
+            TargetStock = args.Stock,
+            CurrencyConverter = currencyConverter,
+            Currency = config.Currency!
         };
-
-        // Validate whether we have a 'To' address set before trying to
-        // send emails.
-        if (string.IsNullOrEmpty(config.RecipientAddress))
-        {
-            throw new InvalidOperationException("No SMTP 'to' address found in config.");
-        }
-
-        string buyEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.BuyEmailTemplatePath, true);
-        string sellEmailTemplate = EmailTemplates.LoadTemplateFromFile(config.SellEmailTemplatePath, false);
 
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {
@@ -149,13 +177,15 @@ class Program
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price),
+                                                           price,
+                                                           config.Currency),
                 Content: EmailTemplates.ApplySubstitutions(sellEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price)
+                                                           price,
+                                                           config.Currency)
             ));
             Console.WriteLine("Sent sell alert email.");
         };
@@ -168,13 +198,15 @@ class Program
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price),
+                                                           price,
+                                                           config.Currency),
                 Content: EmailTemplates.ApplySubstitutions(buyEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
                                                            args.LowerBound,
                                                            args.UpperBound,
-                                                           price)
+                                                           price,
+                                                           config.Currency)
             ));
             Console.WriteLine($"Sent purchase alert email.");
         };
@@ -189,8 +221,8 @@ class Program
                                         AppConfig config)
     {
         Console.WriteLine($"Monitoring stock {args.Stock}.");
-        Console.WriteLine($"Sell threshold: > {args.UpperBound.ToMoney()}");
-        Console.WriteLine($"Buy threshold: < {args.LowerBound.ToMoney()}");
+        Console.WriteLine($"Sell threshold: > {args.UpperBound.ToMoney(config.Currency)}");
+        Console.WriteLine($"Buy threshold: < {args.LowerBound.ToMoney(config.Currency)}");
         Console.WriteLine($"Notifications will be sent to {config.RecipientAddress}");
         Console.WriteLine();
 

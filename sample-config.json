@@ -1,8 +1,10 @@
 {
+  "Currency": "BRL",
+  "RecipientAddress": "destination-email-address@some-email-provider.email-domain",
   "SMTPUsername": "your-email-username@your-email-provider.your-domain",
   "SMTPPassword": "your-smtp-password",
   "SMTPHost": "your-smtp-host",
-  "RecipientAddress": "destination-email-address@some-email-provider.email-domain",
   "StockAPI": "twelvedata",
+  "ConversionAPI": "twelvedata",
   "TwelveDataAPIKey": "your-twelve-data-api-key"
 }

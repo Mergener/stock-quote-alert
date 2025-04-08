@@ -12,7 +12,7 @@ namespace StockQuoteAlert.Stocks
 
         private record class GetPriceResponse([property: JsonPropertyName("price")] string Price);
 
-        public async Task<decimal> GetLatestStockPrice(string stockName)
+        public async Task<(decimal, string)> GetLatestStockPrice(string stockName)
         {
             var resp = await httpClient.GetAsync($"/price?apikey={apiKey}&symbol={stockName}");
             resp.EnsureSuccessStatusCode();
@@ -37,9 +37,9 @@ namespace StockQuoteAlert.Stocks
             {
                 throw new Exception($"Invalid price format returned from TwelveData API: '{body?.Price}'");
             }
-            return price;
+            return (price, "USD");
         }
-
+        
         public TwelveDataStockProvider(string apiKey)
         {
             ArgumentNullException.ThrowIfNull(apiKey);

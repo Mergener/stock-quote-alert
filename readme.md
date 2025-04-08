@@ -69,6 +69,8 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 ### Required Fields
 
+- `Currency` (string): The currency in which the stock price is displayed.
+
 - `RecipientAddress` (string): The email address where notifications will be sent.
 
 - `SMTPUsername` (string): Your email address used for sending notifications.
@@ -79,15 +81,13 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 
 - `StockAPI` (string): The stock API of choice. Currently supported options are: `"twelvedata"`.
 
-#### Stock API Dependent fields
-If you choose the TwelveData API, you must also provide the following field:
+- `ConversionAPI` (string): The currency conversion API of choice. Currently supported options are: `"twelvedata"`.
+
+### Conditionally required fields
+If you choose the TwelveData API for either stock information or currency conversion, you must also provide the following field:
 - `TwelveDataAPIKey` (string): Your Twelve Data API key. You can obtain one for free at [Twelve Data](https://twelvedata.com/).
 
 ### Optional Fields
-
-- `SMTPPort` (int): The SMTP port number. Defaults to `587` if unspecified.
-
-- `SMTPSSL` (bool): Whether to use SSL for the SMTP connection. Defaults to `false` if unspecified.
 
 - `MonitoringInterval` (int): Interval, in seconds, between each stock price check. Defaults to `10` if unspecified.
 
@@ -95,17 +95,21 @@ If you choose the TwelveData API, you must also provide the following field:
 until either this interval ends or the price drops below the
 upperbound. The equivalent logic also applies to 'sell' emails. Defaults to `3600` (1 hour) if unspecified.
 
+- `SenderName` (string): How the sender's name will appear in the email. Defaults to "Stock Quote Alert System" if unspecified.
+
+- `RecipientName` (string): The name of the email recipient. Defaults to an empty value if unspecified.
+
 - `BuyEmailTemplatePath` (string): Path to a custom HTML email template for 'buy' emails. If not provided, a default template will be used.
 
 - `BuyEmailSubject` (string): The subject text of 'buy' emails. Defaults to "Buy %%STOCK%%!"  if unspecified.
 
 - `SellEmailTemplatePath` (string): Path to a custom HTML email template for 'sell' emails. If not provided, a default template will be used.
 
-- `SellEmailSubject`: The subject text of 'buy' emails. Defaults to "Sell %%STOCK%%!"  if unspecified.
+- `SellEmailSubject` (string): The subject text of 'buy' emails. Defaults to "Sell %%STOCK%%!"  if unspecified.
 
-- `SenderName`: How the sender's name will appear in the email. Defaults to "Stock Quote Alert System" if unspecified.
+- `SMTPPort` (int): The SMTP port number. Defaults to `587` if unspecified.
 
-- `RecipientName`: The name of the email recipient. Defaults to an empty value if unspecified.
+- `SMTPSSL` (bool): Whether to use SSL for the SMTP connection. Defaults to `false` if unspecified.
 
 ## Email Templates
 
