@@ -18,14 +18,14 @@ To build the project, navigate to the project directory and run the following co
 dotnet build -c <Debug|Release>
 ```
 
+This will create an executable file in the `bin/Debug|Release/net8.0` directory.
+
 ### Via Visual Studio
 Simply launching Visual Studio and opening the solution file will handle dependencies and build the project.
 
 Note that you need to specify command line arguments in the project Debug properties in order to properly run the program.
 
 No Visual Studio versions below VS 2022 were tested.
-
-This will create an executable file in the `bin/Debug|Release/net8.0` directory.
 
 ## Usage
 
