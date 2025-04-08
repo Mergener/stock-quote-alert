@@ -1,7 +1,7 @@
 ﻿namespace StockQuoteAlert.Emails
 {
     public record EmailAddress(string Address, string Name);
-    public record SendEmailArgs(string To, string? Subject, string? Content);
+    public record SendEmailArgs(EmailAddress To, string? Subject, string? Content);
 
     public interface IEmailClient
     {

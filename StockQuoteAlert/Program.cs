@@ -99,8 +99,13 @@ class Program
         stockMonitor.PriceAboveUpperbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress,
-                Subject: config.SellEmailSubject,
+                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                Subject: EmailTemplates.ApplySubstitutions(config.SellEmailSubject,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price),
                 Content: EmailTemplates.ApplySubstitutions(sellEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
@@ -113,8 +118,13 @@ class Program
         stockMonitor.PriceBelowLowerbound += async (string stock, decimal price) =>
         {
             await emailClient.SendEmail(new SendEmailArgs(
-                To: config.SMTPToAddress,
-                Subject: config.BuyEmailSubject,
+                To: new EmailAddress(config.SMTPToAddress, config.RecipientName),
+                Subject: EmailTemplates.ApplySubstitutions(config.BuyEmailSubject,
+                                                           config.RecipientName ?? string.Empty,
+                                                           stock,
+                                                           args.LowerBound,
+                                                           args.UpperBound,
+                                                           price),
                 Content: EmailTemplates.ApplySubstitutions(buyEmailTemplate,
                                                            config.RecipientName ?? string.Empty,
                                                            stock,
@@ -145,26 +155,6 @@ class Program
             await stockMonitor.Poll();
             int intervalMs = (int)(config.MonitoringInterval * 1000.0);
             await Task.Delay(intervalMs);
-        }
-    }
-
-    static SendEmailArgs GenerateEmail(AppConfig config, 
-                                       string template,
-                                       bool buy)
-    {
-        return new SendEmailArgs(config.SMTPToAddress!, "Subject", template);
-    }
-
-    static string? LoadEmailTemplate(string templatePath)
-    {
-        try
-        {
-            string template = File.ReadAllText(templatePath);
-            return template;
-        }
-        catch
-        {
-            return null;
         }
     }
 }
