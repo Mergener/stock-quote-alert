@@ -18,8 +18,8 @@ StockQuoteAlert <stock-name> <upperbound> <lowerbound> [config]
 
 Where:
 - `stock-name`: The name of the stock you want to monitor (e.g., `AAPL` for Apple).
-- `lowerbound`: The lower price limit for the stock.
 - `upperbound`: The upper price limit for the stock.
+- `lowerbound`: The lower price limit for the stock.
 - `config`: Optional. The path to the configuration file. If not provided, the program will look for a file named `config.json` in the working directory.
 
 Example:
