@@ -49,6 +49,17 @@ StockQuoteAlert AAPL 150 200 path/to/config.json
 Note that the program **requires** a valid configuration file that
 specifies at least some required options. See the section below.
 
+## Running tests
+
+### Via dotnet CLI
+From any subdirectory of the repository's directory, run:
+```bash
+dotnet test
+```
+
+### Via Visual Studio
+Right-click the 'Tests' project in the Solution Explorer and select 'Run Tests'.
+
 ## Configuration
 
 A configuration file is required to execute the program. It can also be used to override some default settings.
