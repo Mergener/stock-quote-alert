@@ -53,3 +53,7 @@ Create a copy of this file, rename it to sample-config.json and fill in any requ
 - `SMTPSSL` (bool): Whether to use SSL for the SMTP connection. Defaults to `false` if unspecified.
 
 - `MonitoringInterval` (int): Interval, in seconds, between each stock price check. Defaults to `10` if unspecified.
+
+- `EmailSpamInterval` (int): An interval, in seconds, to prevent email spam. This interval works as follows: if a 'buy' email is sent, no other 'buy' emaill will be sent
+until either this interval ends or the price drops below the
+upperbound. The equivalent logic also applies to 'sell' emails. Defaults to `3600` (1 hour) if unspecified.

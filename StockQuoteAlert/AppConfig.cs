@@ -15,7 +15,6 @@ namespace StockQuoteAlert
 
         /// <summary>
         /// An interval, in seconds, to prevent email spam.
-        /// 
         /// The interval works as follows:
         /// If a 'buy' email is sent, no other 'buy' emaill will be sent
         /// until either this interval ends or the price drops below the
