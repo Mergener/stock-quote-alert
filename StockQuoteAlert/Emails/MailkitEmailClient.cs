@@ -20,7 +20,7 @@ namespace StockQuoteAlert.Emails
             message.To.Add(new MailboxAddress(string.Empty, args.To));
             message.Subject = args.Subject ?? string.Empty;
 
-            message.Body = new TextPart("plain")
+            message.Body = new TextPart("html")
             {
                 Text = args.Content ?? string.Empty
             };

@@ -37,9 +37,17 @@ namespace StockQuoteAlert
         /// Who we are sending emails to.
         /// </summary>
         public string? SMTPToAddress { get; set; }
-
+        
+        public string? RecipientName { get; set; }
         public int SMTPPort { get; set; } = 587;
         public bool SMTPSSL { get; set; } = true;
+        #endregion
+
+        #region Email
+        public string BuyEmailSubject { get; set; } = "Buy a stock!";
+        public string? BuyEmailTemplatePath { get; set; } = null;
+        public string SellEmailSubject { get; set; } = "Sell a stock!";
+        public string? SellEmailTemplatePath { get; set; } = null;
         #endregion
 
         public static AppConfig LoadFromFile(string path)
