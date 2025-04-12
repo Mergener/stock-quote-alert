@@ -15,7 +15,7 @@ namespace StockQuoteAlert.Stocks
 
         public async Task<(decimal, string)> GetLatestStockPrice(string stockName)
         {
-            var resp = await httpClient.GetAsync($"/price?apikey={apiKey}&symbol={stockName}");
+            var resp = await httpClient.GetAsync($"/quote?apikey={apiKey}&symbol={stockName}");
             resp.EnsureSuccessStatusCode();
 
             var body = await resp.Content.ReadFromJsonAsync<GetQuoteResponse>();
